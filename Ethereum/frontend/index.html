@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DApp Médicale - Intégrité Blockchain Ethereum</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Ethers.js v6 CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <div class="logo">
+                <span class="icon">⛓️🩺</span>
+                <div>
+                    <h1>MedicalRecord DApp</h1>
+                    <p class="subtitle">Vérification d'Intégrité de Dossiers Médicaux sur Ethereum</p>
+                </div>
+            </div>
+            <button id="connectBtn" class="btn btn-primary">🦊 Connecter MetaMask</button>
+        </header>
+
+        <!-- STATUS BAR -->
+        <section class="card status-card">
+            <h2>📡 Statut de la Connexion</h2>
+            <div class="status-grid">
+                <div class="status-item">
+                    <span class="label">Compte MetaMask :</span>
+                    <span id="accountAddress" class="value badge">Non connecté</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">Réseau :</span>
+                    <span id="networkName" class="value badge">-</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">Solde :</span>
+                    <span id="accountBalance" class="value">-</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">Smart Contract :</span>
+                    <span id="contractStatus" class="value badge badge-info">0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="main-grid">
+            <!-- 1. ENREGISTRER UN HASH (TRANSACTION PAYANTE) -->
+            <section class="card">
+                <h2>✍️ 1. Enregistrer une Empreinte (On-Chain)</h2>
+                <p class="card-desc">Effectue une transaction Ethereum pour archiver le hash SHA-256 du dossier médical.</p>
+                
+                <form id="addRecordForm">
+                    <div class="form-group">
+                        <label for="addPatientId">ID du Patient (entier) :</label>
+                        <input type="number" id="addPatientId" min="1" value="1" required placeholder="Ex: 1">
+                    </div>
+                    <div class="form-group">
+                        <label for="addRecordHash">Empreinte SHA-256 du dossier :</label>
+                        <input type="text" id="addRecordHash" required placeholder="Ex: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855">
+                        <button type="button" id="generateHashBtn" class="btn btn-small btn-secondary">⚡ Générer un Hash de test</button>
+                    </div>
+                    <button type="submit" id="submitRecordBtn" class="btn btn-success full-width">📝 Envoyer la Transaction (MetaMask)</button>
+                </form>
+                <div id="txStatus" class="log-box hidden"></div>
+            </section>
+
+            <!-- 2. LIRE LE DERNIER HASH (LECTURE GRATUITE) -->
+            <section class="card">
+                <h2>🔍 2. Consulter le Dernier Hash Enregistré</h2>
+                <p class="card-desc">Appel en lecture (view/call) direct sur la blockchain (aucun frais de gas).</p>
+                
+                <form id="getRecordForm">
+                    <div class="form-group">
+                        <label for="getPatientId">ID du Patient :</label>
+                        <input type="number" id="getPatientId" min="1" value="1" required placeholder="Ex: 1">
+                    </div>
+                    <button type="submit" class="btn btn-info full-width">🔎 Interroger la Blockchain</button>
+                </form>
+
+                <div id="readResult" class="result-box hidden">
+                    <p><strong>Dernier Hash :</strong> <span id="resHash" class="code-text"></span></p>
+                    <p><strong>Date d'enregistrement :</strong> <span id="resTimestamp"></span></p>
+                    <p><strong>Total des versions :</strong> <span id="resCount" class="badge"></span></p>
+                </div>
+            </section>
+
+            <!-- 3. VÉRIFIER L'INTÉGRITÉ DU DOSSIER -->
+            <section class="card full-span">
+                <h2>🛡️ 3. Vérification d'Intégrité (Dossier Intègre vs Altéré)</h2>
+                <p class="card-desc">Compare l'empreinte du dossier médical actuel avec le hash immuable archivé sur Ethereum.</p>
+                
+                <form id="verifyForm" class="inline-form">
+                    <div class="form-group">
+                        <label for="verifyPatientId">ID Patient :</label>
+                        <input type="number" id="verifyPatientId" min="1" value="1" required>
+                    </div>
+                    <div class="form-group flex-2">
+                        <label for="verifyHash">Hash à vérifier :</label>
+                        <input type="text" id="verifyHash" required placeholder="Coller le hash SHA-256 à tester...">
+                    </div>
+                    <button type="submit" class="btn btn-warning">🛡️ Vérifier l'Intégrité</button>
+                </form>
+
+                <div id="integrityResult" class="alert-box hidden"></div>
+            </section>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
