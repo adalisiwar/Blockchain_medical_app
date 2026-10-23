@@ -76,19 +76,3 @@ cd Ethereum
 npm install
 npx hardhat test
 ```
-
-## Deploy to Sepolia
-
-Configure the Hardhat variables `SEPOLIA_RPC_URL` and `SEPOLIA_PRIVATE_KEY`, for example with Hardhat's keystore. Never commit private keys or other secrets.
-
-From the `Ethereum/` directory, deploy `MedicalRecord` with:
-
-```powershell
-npx hardhat run scripts/deploy.ts --network sepolia
-```
-
-## Security and privacy
-
-- Keep `.env` files, private keys, and credentials out of version control.
-- Do not use real patient data for development or testing.
-- This project is a prototype and is not a substitute for a security, privacy, or regulatory review before handling real health information.
