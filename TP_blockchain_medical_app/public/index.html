@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dossier Medical - Connexion</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+  <div class="card auth-card">
+    <h2>🩺 Dossier Médical</h2>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tabLogin">Se connecter</button>
+      <button class="tab-btn" id="tabRegister">Créer un compte</button>
+    </div>
+
+    <!-- FORMULAIRE CONNEXION -->
+    <form id="loginForm" autocomplete="off">
+      <label>Email</label>
+      <input type="email" id="loginEmail" required placeholder="vous@exemple.com" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <label>Mot de passe</label>
+      <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <button type="submit" class="btn">Connexion</button>
+      <div class="error-msg" id="loginError"></div>
+    </form>
+
+    <!-- FORMULAIRE INSCRIPTION -->
+    <form id="registerForm" class="hidden" autocomplete="off">
+      <label>Je suis</label>
+      <select id="registerRole" autocomplete="off">
+        <option value="patient">Patient</option>
+        <option value="medecin">Médecin</option>
+      </select>
+
+      <label>Nom complet</label>
+      <input type="text" id="registerName" required placeholder="Nom et prénom" autocomplete="off" autocapitalize="words" spellcheck="false">
+
+      <label>Email</label>
+      <input type="email" id="registerEmail" required placeholder="vous@exemple.com" autocomplete="off" autocapitalize="none" spellcheck="false">
+
+      <label>Mot de passe</label>
+      <input type="password" id="registerPassword" required placeholder="Minimum 6 caractères" autocomplete="new-password" autocapitalize="none" spellcheck="false">
+
+      <div id="doctorFields">
+        <label>Spécialité</label>
+        <input type="text" id="registerSpecialty" placeholder="Ex: Médecine générale" autocomplete="off" autocapitalize="words" spellcheck="false">
+      </div>
+
+      <div id="patientFields" class="hidden">
+        <label>Choisir votre médecin</label>
+        <select id="registerDoctor" autocomplete="off">
+          <option value="">Chargement…</option>
+        </select>
+
+        <label>Date de naissance</label>
+        <input type="date" id="registerBirthDate" autocomplete="off">
+        <label>Genre</label>
+        <select id="registerGender" autocomplete="off">
+          <option value="Homme">Homme</option>
+          <option value="Femme">Femme</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn">Créer mon compte</button>
+      <div class="error-msg" id="registerError"></div>
+    </form>
+
+    <div style="margin-top: 20px; padding-top: 14px; border-top: 1px dashed #cbd5e1; font-size: 13px; color: #64748b;">
+      <strong style="color: #334155; display: block; margin-bottom: 6px;">💡 Comptes de test pré-configurés :</strong>
+      <button type="button" class="btn btn-secondary btn-small" style="width: 100%; text-align: left; margin-bottom: 6px;" onclick="document.getElementById('loginEmail').value='sara.medecin@test.com'; document.getElementById('loginPassword').value='password123';">
+        👩‍⚕️ <strong>Dr. Sara Mansour</strong> (Médecin) — <code>sara.medecin@test.com</code> / <code>password123</code>
+      </button>
+      <button type="button" class="btn btn-secondary btn-small" style="width: 100%; text-align: left;" onclick="document.getElementById('loginEmail').value='ahmed.patient@test.com'; document.getElementById('loginPassword').value='password123';">
+        🧑 <strong>Ahmed Trabelsi</strong> (Patient) — <code>ahmed.patient@test.com</code> / <code>password123</code>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/auth.js"></script>
+</body>
+</html>

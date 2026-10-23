@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dossier patient & Blockchain</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">🩺 Espace Médecin</div>
+  <div class="user-info">
+    <span id="doctorName"></span>
+    <button class="btn btn-secondary btn-small" onclick="logout()">Déconnexion</button>
+  </div>
+</header>
+
+<div class="container">
+  <button class="link-btn" onclick="window.location.href='dashboard.html'">← Retour à la liste des patients</button>
+
+  <!-- 1. INFOS PATIENT -->
+  <div class="card" id="patientInfoCard" style="margin-top: 14px;">
+    <h2 id="patientName">Chargement...</h2>
+    <p id="patientDetails" style="color:#64748b; font-size:14px;"></p>
+  </div>
+
+  <!-- 2. PANNEAU D'INTÉGRATION BLOCKCHAIN ETHEREUM -->
+  <div class="card blockchain-card">
+    <div class="blockchain-header">
+      <h3 style="margin: 0; color: #0284c7; display: flex; align-items: center; gap: 8px;">
+        ⛓️ Intégration Blockchain Ethereum (Smart Contract MedicalRecord)
+      </h3>
+      <button id="btnConnectWallet" class="btn btn-metamask btn-small" onclick="connectWallet()">
+        🦊 Connecter MetaMask
+      </button>
+    </div>
+
+    <!-- Informations Connexion & Contrat -->
+    <div class="bc-info-grid">
+      <div class="bc-info-box">
+        <span class="label">Compte MetaMask</span>
+        <span class="value" id="bcAccount">Non connecté</span>
+      </div>
+      <div class="bc-info-box">
+        <span class="label">Réseau & Chain ID</span>
+        <span class="value" id="bcNetwork">Inconnu</span>
+      </div>
+      <div class="bc-info-box">
+        <span class="label">Contrat MedicalRecord</span>
+        <span class="value" id="bcContractAddress" style="font-family: monospace; font-size: 11px;">0x5FbDB2315678afecb367f032d93F642f64180aa3</span>
+      </div>
+    </div>
+
+    <!-- Statut On-Chain -->
+    <div style="background: white; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+      <h4 style="margin: 0 0 10px 0; color: #0369a1;">
+        📦 État On-Chain pour ce patient (ID #<span id="bcPatientId">...</span>)
+      </h4>
+      <div class="bc-info-grid" style="margin-bottom: 8px;">
+        <div class="bc-info-box">
+          <span class="label">Nombre d'enregistrements (Versions)</span>
+          <span class="value" id="bcRecordCount" style="color: #0284c7; font-size: 15px;">0</span>
+        </div>
+        <div class="bc-info-box">
+          <span class="label">Date du dernier ancrage</span>
+          <span class="value" id="bcLastTimestamp">Aucun</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 8px;">
+        <span class="label" style="font-size: 11px; font-weight: 700; color: var(--muted);">DERNIER HASH ANCRÉ SUR LA BLOCKCHAIN (ON-CHAIN) :</span>
+        <div class="hash-container" id="bcOnChainHash" style="color: #0284c7; font-weight: bold;">
+          Aucun hash enregistré sur la blockchain
+        </div>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <span class="label" style="font-size: 11px; font-weight: 700; color: var(--muted);">HASH ACTUEL DU DOSSIER LOCAL (CALCULÉ CÔTÉ CLIENT) :</span>
+        <div class="hash-container" id="bcLocalHash" style="color: #334155;">
+          Calcul en cours...
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertes Résultat Intégrité & Statut Tx -->
+    <div id="integrityResultBox" style="display: none;"></div>
+    <div id="txStatusBox" style="display: none;"></div>
+
+    <!-- Boutons d'Action Blockchain -->
+    <div class="btn-row">
+      <button id="btnSaveRecord" class="btn" style="width: auto;" onclick="saveRecordToBlockchain()">
+        💾 Enregistrer le dossier sur la blockchain
+      </button>
+      <button id="btnVerifyIntegrity" class="btn btn-success btn-small" style="font-size: 14px; padding: 11px 18px;" onclick="verifyRecordIntegrity()">
+        🔍 Vérifier l'intégrité
+      </button>
+      <button class="btn btn-secondary btn-small" style="font-size: 14px; padding: 11px 18px;" onclick="refreshBlockchainData()">
+        🔄 Actualiser Statut
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. ACTIONS DE MODIFICATION DU DOSSIER -->
+  <div class="grid-2">
+    <div class="card">
+      <h3>➕ Nouvelle consultation</h3>
+      <form id="consultationForm">
+        <label>Motif</label>
+        <input type="text" id="reason" placeholder="Ex: Douleur abdominale" required>
+        <label>Notes</label>
+        <textarea id="notes" placeholder="Observations, examen clinique..."></textarea>
+        <button type="submit" class="btn">Ajouter la consultation</button>
+        <div class="error-msg" id="consultationError"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Ajouter à une consultation existante</h3>
+      <label>Consultation cible</label>
+      <select id="targetConsultation"></select>
+
+      <div style="margin-top:16px;">
+        <strong>Diagnostic</strong>
+        <form id="diagnosticForm">
+          <textarea id="diagnosticDescription" placeholder="Description du diagnostic" required></textarea>
+          <button type="submit" class="btn">Ajouter le diagnostic</button>
+        </form>
+      </div>
+
+      <div style="margin-top:20px;">
+        <strong>Prescription</strong>
+        <form id="prescriptionForm">
+          <label>Médicament</label>
+          <input type="text" id="medication" required placeholder="Ex: Paracétamol">
+          <label>Dosage</label>
+          <input type="text" id="dosage" placeholder="Ex: 500mg, 3x/jour">
+          <label>Durée</label>
+          <input type="text" id="duration" placeholder="Ex: 5 jours">
+          <label>Instructions</label>
+          <textarea id="instructions" placeholder="Instructions complementaires"></textarea>
+          <button type="submit" class="btn">Ajouter la prescription</button>
+        </form>
+      </div>
+      <div class="error-msg" id="subFormError"></div>
+    </div>
+  </div>
+
+  <!-- 4. HISTORIQUE MÉDICAL -->
+  <div class="card">
+    <h3>📋 Historique médical</h3>
+    <div id="historyContainer"></div>
+  </div>
+</div>
+
+<!-- Ethers.js v6 UMD CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/patient.js"></script>
+</body>
+</html>

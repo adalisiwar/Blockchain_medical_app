@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace Médecin</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">🩺 Espace Médecin</div>
+  <div class="user-info">
+    <span id="doctorName"></span>
+    <button class="btn btn-secondary btn-small" onclick="logout()">Déconnexion</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h2>Mes patients</h2>
+    <table id="patientsTable">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Date de naissance</th>
+          <th>Genre</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="patientsBody"></tbody>
+    </table>
+    <div class="empty-state hidden" id="emptyState">Aucun patient enregistré pour le moment.</div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

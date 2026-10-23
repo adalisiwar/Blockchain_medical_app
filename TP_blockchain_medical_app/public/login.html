@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - Dossier Médical Blockchain</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .auth-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0ea5e9 0%, #1e40af 100%);
+      padding: 20px;
+    }
+    .auth-card {
+      background: white;
+      border-radius: 16px;
+      padding: 36px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .auth-header h1 {
+      font-size: 22px;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .auth-header p {
+      color: #64748b;
+      font-size: 14px;
+    }
+    .role-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+    .demo-accounts {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px dashed #cbd5e1;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .demo-btn {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .demo-btn:hover {
+      background: #e2e8f0;
+      border-color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div style="font-size: 38px; margin-bottom: 8px;">🏥 ⛓️</div>
+        <h1>MedChain Records</h1>
+        <p>Gestion sécurisée des dossiers médicaux par Ethereum</p>
+      </div>
+
+      <div id="errorAlert" class="alert alert-danger" style="display: none;"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Adresse Email</label>
+          <input type="email" id="email" required placeholder="nom@exemple.com" value="sara.mansour@medecin.tn">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" required placeholder="••••••••" value="doctor123">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          Se connecter
+        </button>
+      </form>
+
+      <div class="demo-accounts">
+        <strong style="color: #334155;">Comptes de test pré-configurés :</strong>
+        <button type="button" class="demo-btn" onclick="fillCredentials('sara.mansour@medecin.tn', 'doctor123')">
+          👩‍⚕️ <strong>Dr. Sara Mansour</strong> (Médecin) - <em>sara.mansour@medecin.tn</em>
+        </button>
+        <button type="button" class="demo-btn" onclick="fillCredentials('ali.benamor@medecin.tn', 'doctor123')">
+          👨‍⚕️ <strong>Dr. Ali Ben Amor</strong> (Médecin) - <em>ali.benamor@medecin.tn</em>
+        </button>
+        <button type="button" class="demo-btn" onclick="fillCredentials('ahmed.trabelsi@patient.tn', 'patient123')">
+          🧑 <strong>Ahmed Trabelsi</strong> (Patient) - <em>ahmed.trabelsi@patient.tn</em>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function fillCredentials(email, pass) {
+      document.getElementById('email').value = email;
+      document.getElementById('password').value = pass;
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const errorAlert = document.getElementById('errorAlert');
+
+      errorAlert.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Identifiants invalides');
+        }
+
+        // Sauvegarder dans localStorage
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        if (data.user.role === 'DOCTOR') {
+          window.location.href = '/doctor/dashboard.html';
+        } else if (data.user.role === 'PATIENT') {
+          window.location.href = '/patient/dashboard.html';
+        } else {
+          window.location.href = '/doctor/dashboard.html';
+        }
+      } catch (err) {
+        errorAlert.textContent = err.message;
+        errorAlert.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dossier Patient & Blockchain - MedChain</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="navbar">
+    <a href="/doctor/dashboard.html" class="nav-brand">
+      🏥 MedChain - Dossier Médical & Blockchain
+    </a>
+    <div class="nav-actions">
+      <a href="/doctor/dashboard.html" class="btn btn-secondary">⬅️ Retour à la liste</a>
+      <span class="user-tag" id="doctorNameTag">👨‍⚕️ Médecin</span>
+      <button class="btn btn-danger" onclick="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Message global -->
+    <div id="pageAlert" class="alert" style="display: none;"></div>
+
+    <!-- 1. PANNEAU BLOCKCHAIN ETHEREUM -->
+    <div class="card blockchain-panel">
+      <div class="card-header">
+        <h2 class="card-title">⛓️ Intégration Blockchain Ethereum (Smart Contract MedicalRecord)</h2>
+        <div>
+          <button id="btnConnectMetamask" class="btn btn-metamask" onclick="connectWallet()">
+            🦊 Connecter MetaMask
+          </button>
+        </div>
+      </div>
+
+      <!-- État de connexion Web3 -->
+      <div class="bc-status-grid">
+        <div class="bc-status-item">
+          <span class="label">Compte MetaMask</span>
+          <span class="val" id="bcAccount">Non connecté</span>
+        </div>
+        <div class="bc-status-item">
+          <span class="label">Réseau & Chain ID</span>
+          <span class="val" id="bcNetwork">Inconnu</span>
+        </div>
+        <div class="bc-status-item">
+          <span class="label">Contrat MedicalRecord</span>
+          <span class="val" id="bcContractAddress" style="font-family: monospace; font-size: 12px;">0x5FbDB2315678afecb367f032d93F642f64180aa3</span>
+        </div>
+      </div>
+
+      <!-- Statut On-Chain du Dossier -->
+      <div style="background: white; border: 1px solid #bae6fd; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <h4 style="color: #0369a1; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+          📦 État On-Chain pour ce Patient (<span id="statusPatientLabel">ID #...</span>)
+        </h4>
+
+        <div class="bc-status-grid" style="margin-bottom: 8px;">
+          <div class="bc-status-item">
+            <span class="label">Nombre d'enregistrements (Versions)</span>
+            <span class="val" id="onChainCount" style="font-size: 16px; color: #0284c7;">0</span>
+          </div>
+          <div class="bc-status-item">
+            <span class="label">Date du dernier ancrage</span>
+            <span class="val" id="onChainTimestamp">Aucun</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <span class="label" style="font-size: 11px; font-weight: 700; color: var(--text-muted);">DERNIER HASH ANCRÉ SUR LA BLOCKCHAIN (ON-CHAIN) :</span>
+          <div class="hash-display" id="onChainHash" style="color: #0369a1; font-weight: bold;">
+            Aucun hash enregistré sur la blockchain
+          </div>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <span class="label" style="font-size: 11px; font-weight: 700; color: var(--text-muted);">HASH ACTUEL DU DOSSIER LOCAL (CALCULÉ CÔTÉ CLIENT) :</span>
+          <div class="hash-display" id="localRecordHash" style="color: #334155;">
+            Calcul en cours...
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone Résultat Vérification d'Intégrité -->
+      <div id="integrityResultBox" style="display: none;"></div>
+
+      <!-- Actions Blockchain -->
+      <div class="actions-row">
+        <button id="btnSaveBlockchain" class="btn btn-primary" onclick="saveRecordToBlockchain()">
+          💾 Enregistrer le dossier sur la blockchain
+        </button>
+        <button id="btnVerifyIntegrity" class="btn btn-success" onclick="verifyRecordIntegrity()">
+          🔍 Vérifier l'intégrité
+        </button>
+        <button class="btn btn-secondary" onclick="refreshBlockchainData()">
+          🔄 Actualiser Statut Blockchain
+        </button>
+      </div>
+
+      <!-- Zone de log de transaction -->
+      <div id="txLog" class="alert alert-info" style="display: none; margin-top: 16px;"></div>
+    </div>
+
+    <!-- 2. INFORMATIONS DU PATIENT -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">🧑 Informations Générales du Patient</h2>
+      </div>
+      <div class="bc-status-grid">
+        <div class="bc-status-item">
+          <span class="label">Identifiant Patient</span>
+          <span class="val" id="patId">#...</span>
+        </div>
+        <div class="bc-status-item">
+          <span class="label">Nom & Prénom</span>
+          <span class="val" id="patName">Chargement...</span>
+        </div>
+        <div class="bc-status-item">
+          <span class="label">Email</span>
+          <span class="val" id="patEmail">Chargement...</span>
+        </div>
+        <div class="bc-status-item">
+          <span class="label">Date de Naissance</span>
+          <span class="val" id="patBirth">Chargement...</span>
+        </div>
+        <div class="bc-status-item">
+          <span class="label">Genre</span>
+          <span class="val" id="patGender">Chargement...</span>
+        </div>
+        <div class="bc-status-item">
+          <span class="label">Groupe Sanguin</span>
+          <span class="val" id="patBlood">Chargement...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. HISTORIQUE DES CONSULTATIONS & MODIFICATION DU DOSSIER -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">🩺 Historique Médical & Consultations</h2>
+        <button class="btn btn-primary" onclick="openConsultationModal()">
+          ➕ Ajouter une consultation / Prescription
+        </button>
+      </div>
+
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">
+        💡 <em>Toute modification ou ajout de consultation modifiera instantanément le hash du dossier médical. Vous pourrez alors tester la détection de modification via la vérification d'intégrité.</em>
+      </p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Médecin</th>
+            <th>Diagnostic</th>
+            <th>Prescription</th>
+            <th>Notes & Observations</th>
+          </tr>
+        </thead>
+        <tbody id="consultationsTableBody">
+          <!-- Dynamique -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Modal Ajouter Consultation -->
+  <div id="consultationModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeConsultationModal()">&times;</button>
+      <h3 style="margin-bottom: 16px;">➕ Nouvelle Consultation Médicale</h3>
+      <form id="consultationForm">
+        <div class="form-group">
+          <label>Date de la consultation :</label>
+          <input type="date" id="consDate" required>
+        </div>
+        <div class="form-group">
+          <label>Diagnostic :</label>
+          <input type="text" id="consDiag" placeholder="ex: Angine bactérienne" required>
+        </div>
+        <div class="form-group">
+          <label>Prescription / Médicaments :</label>
+          <textarea id="consPresc" rows="2" placeholder="ex: Amoxicilline 1g 2x/jour pendant 6 jours"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Notes & Observations :</label>
+          <textarea id="consNotes" rows="2" placeholder="ex: Contrôle recommandé dans 7 jours"></textarea>
+        </div>
+        <div class="actions-row">
+          <button type="submit" class="btn btn-primary">Enregistrer la consultation</button>
+          <button type="button" class="btn btn-secondary" onclick="closeConsultationModal()">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Ethers.js v6 UMD -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+  <script src="/doctor/js/patient-record.js"></script>
+</body>
+</html>

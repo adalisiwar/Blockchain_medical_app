@@ -1,0 +1,17 @@
+# Base de données SQLite locale
+database.sqlite
+database.sqlite-shm
+database.sqlite-wal
+
+# Variables d'environnement
+.env
+.env.*
+
+# Données locales de l'application médicale
+TP_blockchain_medical_app/data_store.json
+
+# Dépendances Node.js
+node_modules/
+
+# Logs
+*.log
